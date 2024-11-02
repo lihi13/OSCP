@@ -1,0 +1,34 @@
+SA
+- [ ] whoami /all
+	- [ ] if the user is local service/network service: see [[5 - General Tools]] in task schedule
+- [ ] history of shell
+	- [ ] history
+	- [ ] `cat $env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt`
+	- [ ] (Get-PSReadlineOption).HistorySavePath
+- [ ] get autologon creds
+	- [ ] `Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WinLogon' | select "Default*"`
+	- [ ] `reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon" 2>nul | findstr "DefaultUserName DefaultDomainName DefaultPassword"`
+- [ ] recursive ls on c:\\users
+- [ ] check c:\\
+- [ ] search inrasting files like keepass of .git
+- [ ] ls -all `Get-ChildItem -Force`
+- [ ] interesting programs in C:\\Program Files (x86) / C:\\Program Files
+- [ ] ipconfig
+- [ ] netstat -ano
+	- [ ] `netstat -an | findstr "127.0.0.1:"`
+- [ ] search password - reg query HKLM /f password /t REG_SZ /s
+- [ ] Get-RegistryAlwaysInstallElevated
+	- [ ] can run all .msi files
+- [ ] process 
+- [ ] services
+	- [ ] found vuln program
+- [ ] if its script copy files create  symbolic link with admin ssh key
+	- [ ] tools: `New-Item -ItemType SymbolicLink -Path "C:\xampp\htdocs\logs\request.log" -Target "C:\Users\Administrator\.ssh\id_rsa"`
+	- [ ] `mlink`
+	- [ ] `CreateSymlink.exe`
+- [ ] schedule tasks
+- [ ] wipeas
+- [ ] search an exploits from the initial access
+
+- [ ] [[1 - Enumeration - windows SA]]
+- [ ] [[2 - PrivEsc - windows SA]]

@@ -1,0 +1,58 @@
+- [ ] whoami
+- [ ] id
+	- [ ] if the group useless for PE, maybe there are other permmisions.                                    `find / -xdev -group <group_name> 2>/dev/null`
+	- [ ] `find / -xdev -group apache -perm -g=w 2>/dev/null`
+- [ ] cat /etc/passwd
+- [ ] cat /etc/shadow
+- [ ] ls -all /etc |grep passwd
+- [ ] sudo -l
+	- [ ] `__init__.py`
+	- [ ] used strace to see what is does
+	- [ ] strings
+- [ ] SUID - `find / -perm -u=s -type f 2>/dev/null`
+	- [ ]  command without specifying its absolute path
+	- [ ] used strace to see what is does
+	- [ ] strings
+- [ ] getcap -r / 2>/dev/null
+	- [ ] interasting one is `/usr/bin/python3.10 cap_setuid=ep` example in Levram PG
+- [ ] history of shell
+- [ ] `ficnd / -user root -perm -o+w -type f -name "*.sh" 2>/dev/null`
+- [ ] env
+- [ ] reuse password
+- [ ] ssh keys
+- [ ] (netstat -punta || ss -nltpu || netstat -anv) | grep -i listen
+- [ ] process `ps -ef --forest`
+- [ ] `cat /etc/apache2/sites-enabled/<website>.conf`
+- [ ] cat /etc/crontab, ls -l /etc/cron*, /usr/bin/crontab, /var/spool/sacron
+	- [ ] path privilege escalation - command run without full path so create the "command" in other env path
+	- [ ] see artifacts in pspy
+	- [ ] search for service that run the cron and edit it
+	- [ ] if its copy files create  symbolic link with root ssh key
+	- [ ] `__init__.py`
+	- [ ] $PATH
+	- [ ] not full path
+- [ ] try to change the user password using passwd
+- [ ] services status - `systemctl status app`
+	- [ ] https://sploitus.com/exploit?id=EDB-ID:51674
+- [ ] service writeable - `find / -writable -name "*.service" 2>/dev/null`
+	- [ ] change the executable path 
+	- [ ] restart the service
+	- [ ] if not writable - see that process the run it using grep
+- [ ] config file
+	- [ ] when i found db creds I can do the following
+		- [ ] reuse this creds for another user
+		- [ ] connect to the db and find password
+		- [ ] connect to the db and replace password and then connect to the website 
+		- [ ] find creds and connect to the website
+- [ ] hijeck os file
+- [ ] /opt
+- [ ] /var/mail 
+- [ ] pspy
+- [ ] linpeas 
+- [ ] os share files - Exploiting Shared Library Misconfigurations
+- [ ] exploit - check gcc, make, python
+	- [ ] kernel 1.8.23 - pwnkit
+	- [ ] kernel <3.9 - dirtycow
+	- [ ] searchsploit sudo for current sudo version
+	- [ ] suggester.sh
+- [ ] go back to the website and search for another way to get shell as different user
