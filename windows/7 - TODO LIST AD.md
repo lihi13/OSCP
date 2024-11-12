@@ -4,18 +4,18 @@ AD
 	- [ ] spray using `Kerbrute` to see if he valid in the domain
 	- [ ] AS-REP Roasting (need username and domain name)
 	- [ ] spray username as passwords
-	- [ ] `nxc smb 10.10.11.35 -u 'anonmyous' -p '' --rid-brute`
-	- [ ] `impacket-smbclient zeus/guest@192.168.xx.159`
+	- [ ] `nxc smb <IP> -u 'anonmyous' -p '' --rid-brute`
+	- [ ] `impacket-smbclient <hostname/username>@<IP>`
 - [ ] found username & password
 	- [ ] spray via smb, rdp, winrm, wmi
-- [ ] if I have user name & password but without shell
+- [ ] if I have username & password without shell
 	- [ ] connect to smb share
 	- [ ] kerberosting
 	- [ ] spray to other users
 	- [ ] DCSYNC
 	- [ ] using bloodhound-python to enumerate remotlly
-	- [ ] enumerate users info and priv `nxc smb 10.10.11.35 -u 'michael.wrightson' -p 'Cicada$M6Corpb*@Lp#nZp!8'  --users`
-- [ ] add user to remote  management group `net rpc group addmem "Remote Access" "tracy.white" -U "tracy.white%zqwj041FGX" -S 192.168.164.30`
+	- [ ] enumerate users info and priv `nxc smb <IP> -u '<username>' -p '<password>'  --users`
+- [ ] add user to remote  management group `net rpc group addmem "Remote Access" "<username>" -U "<password>" -S <IP>`
 - [ ] mimikatz
 - [ ] sharphound
 - [ ] net users /domain
@@ -29,5 +29,3 @@ AD
 - [ ] nmap
 - [ ] enum SA again
 
-- [ ] [[3 - Enumeration - windows AD]]
-- [ ] [[4 - PrivEsc - windows AD]]

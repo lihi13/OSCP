@@ -87,7 +87,7 @@ systeminfo
 we wan to find:
 - OS 
 - version
-- architecture (32/64) to know witch exe to run
+- architecture (32/64) to know which exe to run
 
 #### Network information 
 
@@ -158,8 +158,6 @@ Get-Process
 wmic process list full
 ```
 
-due to the active process we can infer the purpose of the system
-
 #### Running services
 
  check  services - won't work when using a network logon such as WinRM or a bind shell
@@ -202,7 +200,7 @@ to automate the search files we will use the following command:
 Get-ChildItem -Path <path we want to search in> -Include <structure of files we looking for like: *.txt> -File -Recurse -ErrorAction SilentlyContinue
 
 #for example
-Get-ChildItem -Path C:\Users\dave\ -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue
+Get-ChildItem -Path C:\Users\admin\ -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx -File -Recurse -ErrorAction SilentlyContinue
 ```
 
 this is example of extension for "spray": txt,.pdf,.xls,.xlsx,.doc,.docx 
@@ -218,10 +216,8 @@ reg query HKLM /f password /t REG_SZ /s
 ```
 #### history 
 
-history of command save in:
-- PowerShell Transcription
+history of command save in PowerShell Transcription
 ```
-# PowerShell Transcription
 PowerShell_transcript.<computername>.<random>.<timestamp>.txt.
 type C:\Users\Public\Transcripts\transcript01.txt
 

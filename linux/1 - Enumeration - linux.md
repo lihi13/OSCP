@@ -15,8 +15,6 @@
 
 after we get access on a machine we need to run the following commands to gather information
 
-list of Linux privilege escalation techniques can be found in a compendium[24](https://portal.offsec.com/courses/pen-200/books-and-videos/modal/modules/linux-privilege-escalation/enumerating-linux/manual-enumeration#fn24) by g0tmi1k as well as in other,[25](https://portal.offsec.com/courses/pen-200/books-and-videos/modal/modules/linux-privilege-escalation/enumerating-linux/manual-enumeration#fn25) more up-to-date,[26](https://portal.offsec.com/courses/pen-200/books-and-videos/modal/modules/linux-privilege-escalation/enumerating-linux/manual-enumeration#fn26) resources.
-
 #### Username and hostname 
 
 to get the user id:
@@ -310,11 +308,6 @@ we can check in _GTFOBins_[3](https://portal.offsec.com/courses/pen-200/books-an
 
 #### Automated Enumeration
 
-the script supports "standard" and "detailed" mode. Based on the provided information, the standard mode appears to perform a speed-optimized process and should provide a reduced number of false positives. Therefore, in the following example we are going to transfer the script to the target system and use the standard mode to redirect the entire output to a file called **output.txt**.
-
-```
-./unix-privesc-check standard > output.txt
-```
-
-
-There are many other tools worth mentioning that are specifically tailored for Linux privilege escalation information gathering, including _LinEnum_[3](https://portal.offsec.com/courses/pen-200/books-and-videos/modal/modules/linux-privilege-escalation/enumerating-linux/automated-enumeration#fn3) and _LinPeas_,[4](https://portal.offsec.com/courses/pen-200/books-and-videos/modal/modules/linux-privilege-escalation/enumerating-linux/automated-enumeration#fn4) which have been actively developed and enhanced over recent years.
+- linpeas
+- unix-privesc-check
+- linenum
