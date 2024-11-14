@@ -26,6 +26,8 @@ Machines are arranged from easy to difficult
 
 #### linux
 
+- Hub
+- Levram
 - Crane
 - pyLoader
 - law
@@ -33,7 +35,12 @@ Machines are arranged from easy to difficult
 - bullyBox
 - image
 - Ochima
+- ZenPhoto
+- Extplorer
+- Sorcerer
+- Quackerjack
 - MZEEAV
+- Confusion
 - pc
 - RubyDome
 - Exfiltrated
@@ -55,6 +62,8 @@ Machines are arranged from easy to difficult
 - Walla 
 - Pelican 
 - BlackGate
+- Muddy
+- Scrutiny
 - Pipe
 - Fail
 - Groove
@@ -65,9 +74,14 @@ Machines are arranged from easy to difficult
 - Lavita
 - BackupBuddy
 - xposedapi
+- ProStore
+- Sybaris
+- Banzai
 - Peppo 
 - Illusion
+- GLPI
 - Educated
+- Wheels
 - Splodge
 - hawat
 - Readys 
@@ -77,9 +91,20 @@ Machines are arranged from easy to difficult
 - Hunit 
 - megavolt
 - Boolean
+- PlanetExpress
 - escape
 - Phobos
 - shifty
+- Maria
+- Cassios
+- Mantis
+- Bottleup
+- Lunar
+- Clue
+- Zipper
+- Thor
+- Rookie
+
 
 #### windows
 
@@ -109,6 +134,7 @@ Machines are arranged from easy to difficult
 - Heist 
 - Resourced
 
+
 ### HACK THE BOX
 
 #### linux
@@ -125,6 +151,7 @@ Machines are arranged from easy to difficult
 - Magic 
 - Pandora 
 - Builder 
+
 
 #### windows
 
