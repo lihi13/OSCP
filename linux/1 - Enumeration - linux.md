@@ -69,6 +69,13 @@ architectura:
 ```
 arch
 ```
+#### containers
+
+check if we are running in a container (search for docker)
+```
+cat /proc/mounts
+```
+
 #### Running processes
 
 list system processes (including those run by privileged users):
